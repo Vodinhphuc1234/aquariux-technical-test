@@ -1,0 +1,30 @@
+package com.aquariux.test.cryptocurrencytradingsystem.services.internal.impls;
+
+import com.aquariux.test.cryptocurrencytradingsystem.domains.dtos.responses.OrderBookResponse;
+import com.aquariux.test.cryptocurrencytradingsystem.domains.dtos.responses.base.CustomPage;
+import com.aquariux.test.cryptocurrencytradingsystem.domains.entities.OrderBook;
+import com.aquariux.test.cryptocurrencytradingsystem.mappers.OrderBookMapper;
+import com.aquariux.test.cryptocurrencytradingsystem.repositories.OrderBookRepository;
+import com.aquariux.test.cryptocurrencytradingsystem.services.internal.OrderBookService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class OrderBookServiceImpl implements OrderBookService {
+
+    private final OrderBookRepository orderBookRepository;
+    private final OrderBookMapper orderBookMapper;
+
+    @Override
+    public CustomPage<OrderBookResponse> getOrderBookByUserId(Pageable pageable) {
+        String userIdStr = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Page<OrderBook> orderBookPage = orderBookRepository.findByUserId(Long.parseLong(userIdStr), pageable);
+        return orderBookMapper.toDTOs(orderBookPage);
+    }
+}
